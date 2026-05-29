@@ -1,0 +1,21 @@
+/*
+  - Use npm run dev while coding (tsx). For production or Docker, use build then start (runs dist/).
+  Be careful when changing this file:
+  - Keep "strict": true unless you have a strong reason — it catches many bugs early.
+  - If you change "module" or "target", check that Node 20+ and Docker still run the built app.
+*/
+{
+    "compilerOptions": {
+      "target": "ES2022",
+      "module": "commonjs",
+      "lib": ["ES2022"],
+      "outDir": "dist",
+      "rootDir": "src",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
+  }
