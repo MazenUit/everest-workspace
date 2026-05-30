@@ -45,10 +45,9 @@ export function sendInvalidPickup(res: Response): void {
   });
 }
 
-// Send a 200 OK response when the package is retrieved successfully
-export function sendRetrieved(res: Response, lockerId: string): void {
-  res.status(200).json({
-    lockerId,
-    message: 'Package retrieved successfully',
-  });
+// Send a 200 OK response when the package is retrieved successfully 
+// and the storage charge is returned
+export function sendRetrieved(res: Response, lockerId: string, storageCharge: number): void {
+  res.status(200).json({ lockerId, storageCharge, message: 'Package retrieved successfully' });
 }
+
