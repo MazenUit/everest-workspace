@@ -32,3 +32,18 @@ Valid id + code         Package removed, locker available again
 Wrong code              Invalid pickup
 Unknown locker          Locker not found
 Empty locker            Nothing to retrieve
+
+## storage-charge.test.ts // Tier pricing is tested with an injected clock.
+
+Test                  Rule
+Day 1–5 costs X       First five days billed at X per day
+Day 6–10 costs 2X     Days six to ten billed at 2X per day (e.g. 7 days → 5X + 4X)
+
+## Dev: test storage charges in Dev
+
+Only when `NODE_ENV=development`, on retrieve you may send:
+- Header `X-Simulated-Now: 2026-01-08T10:00:00.000Z`, or
+- Body field `simulatedRetrieveAt` (ISO date string)
+- Store  → storedAt = real now()
+- Retrieve → pickupTime = dev override OR real now()
+         → calculateStorageCharge(storedAt, pickupTime)

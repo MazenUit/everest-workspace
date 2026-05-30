@@ -32,4 +32,4 @@ npm run dev
 ## Run with Docker
 From `package-locker/`:
 ```bash
-docker compose up --build
+docker compose up --build -d

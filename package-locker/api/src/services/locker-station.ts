@@ -8,6 +8,13 @@ import { Locker } from '../domain/locker';
 import { Size } from '../domain/types';
 import { findSmallestAvailableLocker } from '../domain/allocator';
 import { generatePickupCode } from '../domain/pickup-code';
+import { calculateStorageCharge } from '../domain/storage-charge';
+
+// Each stored package has unique locker assignment
+type LockerAssignment = {
+  pickupCode: string;
+  storedAt: Date;
+};
 
 export type StorePackageSuccess = {
   ok: true;
@@ -20,11 +27,16 @@ export type StorePackageFailure = {
   reason: 'NO_SUITABLE_LOCKER';
 };
 
+
 // API layer stays predictable without exceptions
 export type StorePackageResult = StorePackageSuccess | StorePackageFailure;
 
-// Retrieve a package from a locker
-export type RetrievePackageSuccess = { ok: true; lockerId: string };
+// Retrieve ackage from locker
+export type RetrievePackageSuccess = { 
+   ok: true;
+   lockerId: string
+   storageCharge: number; 
+  };
 
 export type RetrievePackageFailure = {
     ok: false;
@@ -36,14 +48,16 @@ export type RetrievePackageResult = RetrievePackageSuccess | RetrievePackageFail
 export class LockerStation {
   // availability
   private lockers: Locker[];
-  // each stored package has a unique code
+  // each stored package has unique code
   private usedPickupCodes = new Set<string>();
-  // each stored package has a unique locker assignment
-  private lockerAssignments = new Map<string, string>();
-
-  constructor(lockers: Locker[]) {
-    this.lockers = lockers.map((locker) => ({ ...locker })); // external arrays and internal state stay separate
+  // each stored package has unique locker assignment
+  private lockerAssignments = new Map<string, LockerAssignment>();
+   
+ 
+  constructor( lockers: Locker[], private readonly now: () => Date = () => new Date()) {
+    this.lockers = lockers.map((locker) => ({ ...locker }));
   }
+
 
   listLockers(): Locker[] {
     return this.lockers.map((locker) => ({ ...locker }));
@@ -59,7 +73,10 @@ export class LockerStation {
     const pickupCode = this.createUniquePickupCode();
     locker.isAvailable = false;
 
-    this.lockerAssignments.set(locker.id, pickupCode);
+    this.lockerAssignments.set(locker.id, {
+      pickupCode,
+      storedAt: this.now(),
+    });
 
     return {
       ok: true,
@@ -68,7 +85,7 @@ export class LockerStation {
     };
   }
 
-  retrievePackage(lockerId: string, pickupCode: string): RetrievePackageResult {
+  retrievePackage(lockerId: string, pickupCode: string,  retrievedAt?: Date): RetrievePackageResult {
     const locker = this.lockers.find((l) => l.id === lockerId);
     if (!locker) {
       return { ok: false, reason: 'LOCKER_NOT_FOUND' };
@@ -76,14 +93,23 @@ export class LockerStation {
     if (locker.isAvailable) {
       return { ok: false, reason: 'LOCKER_EMPTY' };
     }
-    const expectedCode = this.lockerAssignments.get(lockerId);
-    if (expectedCode !== pickupCode) {
+    const assignment = this.lockerAssignments.get(lockerId);
+    if (!assignment || assignment.pickupCode !== pickupCode) {
       return { ok: false, reason: 'INVALID_PICKUP' };
     }
+ 
+    // this forces the retrieve time to be the same as the stored time for testing
+    const pickupTime = retrievedAt ?? this.now();
+
+    const storageCharge = calculateStorageCharge(
+      assignment.storedAt,
+      pickupTime
+    );
+    
     locker.isAvailable = true;
     this.lockerAssignments.delete(lockerId);
     this.usedPickupCodes.delete(pickupCode);
-    return { ok: true, lockerId };
+    return { ok: true, lockerId, storageCharge };
   }
   
   // Mark the locker as busy and create a unique pickup code (one package per locker)

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { LockerStation } from '../services/locker-station';
 import { parsePackageSize } from './helpers/package-size';
 import { parsePickupCode } from './helpers/pickup-code-body';
+import { getDevRetrieveTime } from './helpers/dev-retrieve-time';
 import {
   sendBadSize,
   sendNoLocker,
@@ -38,12 +39,21 @@ export function createLockersRouter(station: LockerStation): Router {
   });
 
   router.post('/lockers/:lockerId/retrieve', (req: Request, res: Response) => {
+
     const pickupCode = parsePickupCode(req.body?.pickupCode);
+    
     if (pickupCode === null) {
       sendMissingPickupCode(res);
       return;
     }
-    const result = station.retrievePackage(req.params.lockerId, pickupCode);
+  
+    const devRetrieveTime = getDevRetrieveTime(req);
+    const result = station.retrievePackage(
+      req.params.lockerId,
+      pickupCode,
+      devRetrieveTime
+    );
+  
     if (!result.ok) {
       if (result.reason === 'INVALID_PICKUP') {
         sendInvalidPickup(res);
@@ -52,7 +62,8 @@ export function createLockersRouter(station: LockerStation): Router {
       sendRetrieveNotFound(res, result.reason);
       return;
     }
-    sendRetrieved(res, result.lockerId);
+  
+    sendRetrieved(res, result.lockerId, result.storageCharge);
   });
 
   return router;
