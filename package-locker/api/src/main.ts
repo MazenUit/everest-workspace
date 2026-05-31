@@ -1,12 +1,12 @@
 import 'dotenv/config';
 import express from 'express';
 import { config } from './config';
-import { createDefaultStation } from './create-station';
+import { createStation } from './create-station';
 import { registerRoutes } from './routes';
 import { checkDatabaseConnection } from './infrastructure/db';
 
 const app = express();
-const station = createDefaultStation();
+const station = createStation();
 
 app.use(express.json());
 registerRoutes(app, station);

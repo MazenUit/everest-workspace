@@ -6,6 +6,4 @@ import { createLockersRouter } from './lockers';
 export function registerRoutes(app: Express, station: LockerStation): void {
   app.use(healthRouter);
   app.use(createLockersRouter(station));
-
-  // later: app.use(createRetrieveRouter(station));
 }
