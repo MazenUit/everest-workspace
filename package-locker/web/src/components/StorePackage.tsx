@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLockerStore } from '../store/locker-store';
 import type { PackageSize } from '../types';
+import { copyText } from '../utils/copy-text';
 import { Panel } from './Panel';
 import { Spinner } from './Spinner';
 
@@ -11,9 +12,12 @@ const input =
   'rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500';
 const btnPrimary =
   'inline-flex w-full items-center justify-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60 sm:w-auto';
+const btnCopy =
+  'rounded border border-green-300 bg-white px-2 py-0.5 text-xs font-medium text-green-800 hover:bg-green-100';
 
 export function StorePackage() {
   const [size, setSize] = useState<PackageSize>('SMALL');
+  const [copied, setCopied] = useState(false);
   const busy = useLockerStore((s) => s.storeBusy);
   const error = useLockerStore((s) => s.storeError);
   const lastStored = useLockerStore((s) => s.lastStored);
@@ -22,6 +26,14 @@ export function StorePackage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     await storePackage(size);
+  }
+
+  async function handleCopyCode() {
+    if (!lastStored) return;
+    const ok = await copyText(lastStored.pickupCode);
+    if (!ok) return;
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
   }
 
   return (
@@ -49,12 +61,18 @@ export function StorePackage() {
       </form>
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       {lastStored && !busy && (
-        <div className="mt-3 space-y-1 rounded-md bg-green-50 p-3 text-sm text-green-800">
+        <div className="mt-3 space-y-2 rounded-md bg-green-50 p-3 text-sm text-green-800">
           <p>
             Locker: <span className="font-mono font-semibold">{lastStored.lockerId}</span>
           </p>
-          <p>
-            Pickup code: <span className="font-mono font-semibold">{lastStored.pickupCode}</span>
+          <p className="flex flex-wrap items-center gap-2">
+            <span>
+              Pickup code:{' '}
+              <span className="font-mono font-semibold">{lastStored.pickupCode}</span>
+            </span>
+            <button type="button" className={btnCopy} onClick={handleCopyCode}>
+              {copied ? 'Copied' : 'Copy code'}
+            </button>
           </p>
         </div>
       )}

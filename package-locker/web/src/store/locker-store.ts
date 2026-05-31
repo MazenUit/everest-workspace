@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import * as api from '../api/client';
 import type { Locker, PackageSize } from '../types';
+import { ensureMinDelay } from '../utils/min-delay';
 
 type StoredResult = { lockerId: string; pickupCode: string };
 
@@ -40,8 +41,10 @@ export const useLockerStore = create<LockerState>((set) => ({
   lastCharge: null,
 
   fetchLockers: async () => {
+    const started = Date.now();
     set({ lockersLoading: true, lockersError: null });
     const result = await api.listLockers();
+    await ensureMinDelay(started);
     if (!result.ok) {
       set({ lockersLoading: false, lockersError: result.error.message });
       return;
@@ -50,8 +53,10 @@ export const useLockerStore = create<LockerState>((set) => ({
   },
 
   storePackage: async (size) => {
+    const started = Date.now();
     set({ storeBusy: true, storeError: null, lastStored: null });
     const result = await api.storePackage(size);
+    await ensureMinDelay(started);
     if (!result.ok) {
       set({ storeBusy: false, storeError: result.error.message });
       return;
@@ -67,8 +72,10 @@ export const useLockerStore = create<LockerState>((set) => ({
   },
 
   retrievePackage: async (lockerId, pickupCode, simulatedIso) => {
+    const started = Date.now();
     set({ retrieveBusy: true, retrieveError: null, lastCharge: null });
     const result = await api.retrievePackage(lockerId, pickupCode, simulatedIso);
+    await ensureMinDelay(started);
     if (!result.ok) {
       set({ retrieveBusy: false, retrieveError: result.error.message });
       return;

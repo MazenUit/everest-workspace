@@ -9,3 +9,5 @@ Zustand store for demo UI state and API calls.
 | `retrieve*` | Customer retrieve + last charge |
 
 Form field text (locker id, pickup code) stays in components — only shared/async state lives here.
+
+Loading flags use `utils/min-delay` so spinners stay visible ~400ms minimum (no flash on fast API).
