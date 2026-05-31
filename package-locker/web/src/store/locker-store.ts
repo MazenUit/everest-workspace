@@ -45,7 +45,7 @@ export const useLockerStore = create<LockerState>((set) => ({
     set({ lockersLoading: true, lockersError: null });
     const result = await api.listLockers();
     await ensureMinDelay(started);
-    if (!result.ok) {
+    if (result.ok === false) {
       set({ lockersLoading: false, lockersError: result.error.message });
       return;
     }
@@ -57,7 +57,7 @@ export const useLockerStore = create<LockerState>((set) => ({
     set({ storeBusy: true, storeError: null, lastStored: null });
     const result = await api.storePackage(size);
     await ensureMinDelay(started);
-    if (!result.ok) {
+    if (result.ok === false) {
       set({ storeBusy: false, storeError: result.error.message });
       return;
     }
@@ -76,7 +76,7 @@ export const useLockerStore = create<LockerState>((set) => ({
     set({ retrieveBusy: true, retrieveError: null, lastCharge: null });
     const result = await api.retrievePackage(lockerId, pickupCode, simulatedIso);
     await ensureMinDelay(started);
-    if (!result.ok) {
+    if (result.ok === false) {
       set({ retrieveBusy: false, retrieveError: result.error.message });
       return;
     }
