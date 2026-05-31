@@ -28,9 +28,10 @@ From `package-locker/`:
 ```bash
 docker compose up --build -d
 docker compose exec -T db psql -U everest -d everest_locker < db/migrations/001_init.sql
+./db/reset-seed.sh
 ```
 
-Reset data + seed: `./db/reset-seed.sh` (see `db/README.md`).
+Re-run `./db/reset-seed.sh` anytime to clear packages and reseed lockers (`db/README.md`).
 
 | Service | URL |
 |---------|-----|

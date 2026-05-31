@@ -3,6 +3,7 @@ import * as api from '../api/client';
 import type { Locker, PackageSize } from '../types';
 import { ensureMinDelay } from '../utils/min-delay';
 
+// Demo UI state + API calls. Business rules stay on the server.
 type StoredResult = { lockerId: string; pickupCode: string };
 
 interface LockerState {
@@ -44,7 +45,9 @@ export const useLockerStore = create<LockerState>((set) => ({
     const started = Date.now();
     set({ lockersLoading: true, lockersError: null });
     const result = await api.listLockers();
+    // Keep spinner visible briefly so fast responses do not flash.
     await ensureMinDelay(started);
+    // ok === false helps TypeScript after the await above.
     if (result.ok === false) {
       set({ lockersLoading: false, lockersError: result.error.message });
       return;
@@ -68,9 +71,11 @@ export const useLockerStore = create<LockerState>((set) => ({
         pickupCode: result.data.pickupCode,
       },
     });
+    // Board should match the locker we just took.
     await useLockerStore.getState().fetchLockers();
   },
 
+  // simulatedIso is sent as X-Simulated-Now (dev API only).
   retrievePackage: async (lockerId, pickupCode, simulatedIso) => {
     const started = Date.now();
     set({ retrieveBusy: true, retrieveError: null, lastCharge: null });
@@ -81,6 +86,7 @@ export const useLockerStore = create<LockerState>((set) => ({
       return;
     }
     set({ retrieveBusy: false, lastCharge: result.data.storageCharge });
+    // Board should show the locker free again.
     await useLockerStore.getState().fetchLockers();
   },
 }));
