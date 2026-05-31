@@ -21,9 +21,23 @@ package-locker/
     src/routes/        HTTP endpoints
     src/tests/         unit tests (domain rules)
     Dockerfile         API container image
+  web/                 optional Vite + React demo UI
   db/                  migrations + seed
   docker-compose.yml   api + database
 ```
+
+## Demo UI (optional)
+
+With API running on port 3000:
+
+```bash
+cd web
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 — list lockers, store, retrieve.
 
 ## Run locally (API only — needs Postgres)
 ```bash
