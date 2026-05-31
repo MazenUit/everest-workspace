@@ -13,21 +13,20 @@ From `package-locker/` (db container must be up):
 ```bash
 docker compose up -d
 docker compose exec -T db psql -U everest -d everest_locker < db/migrations/001_init.sql
+```
 
-# Quick verify 
-docker compose exec db psql -U everest -d everest_locker -c '\dt'
+## Reset + seed (one command)
 
-# Seed lockers
+Clears all packages and puts lockers back to the default four (all available):
 
-docker compose exec db psql -U everest -d everest_locker -c "
-INSERT INTO lockers (id, size, is_available) VALUES
-  ('S1', 'SMALL', true),
-  ('S2', 'SMALL', true),
-  ('M1', 'MEDIUM', true),
-  ('L1', 'LARGE', true);
-"
+```bash
+./db/reset-seed.sh
+```
 
-# check:
+Requires `docker compose up -d` first.
+
+Verify:
+
+```bash
 docker compose exec db psql -U everest -d everest_locker -c 'SELECT * FROM lockers;'
-
 ```

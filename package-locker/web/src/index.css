@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+
+body {
+  @apply m-0 min-h-screen bg-zinc-100 font-sans text-zinc-900 antialiased;
+}
