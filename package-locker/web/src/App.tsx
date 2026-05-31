@@ -11,7 +11,6 @@ export default function App() {
     <main className="app">
       <header>
         <h1>Package Locker Demo</h1>
-        <p>Calls the REST API via Vite proxy — no business logic in the browser.</p>
       </header>
       <LockerBoard refreshKey={refreshKey} />
       <div className="columns">
