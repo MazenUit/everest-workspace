@@ -30,7 +30,7 @@ docker compose up --build -d
 docker compose exec -T db psql -U everest -d everest_locker < db/migrations/001_init.sql
 ```
 
-Seed and verify: see `db/README.md`.
+Reset data + seed: `./db/reset-seed.sh` (see `db/README.md`).
 
 | Service | URL |
 |---------|-----|
