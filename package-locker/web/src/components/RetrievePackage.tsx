@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useLockerStore } from '../store/locker-store';
 import { Panel } from './Panel';
+import { Spinner } from './Spinner';
 
 const label = 'flex flex-col gap-1 text-sm text-zinc-700';
 const input =
-  'rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500';
+  'rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 disabled:bg-zinc-50';
 const btnPrimary =
-  'w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 sm:w-auto';
+  'inline-flex w-full items-center justify-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60 sm:w-auto';
 
 export function RetrievePackage() {
   const [lockerId, setLockerId] = useState('');
@@ -39,6 +40,7 @@ export function RetrievePackage() {
             className={input}
             value={lockerId}
             onChange={(e) => setLockerId(e.target.value)}
+            disabled={busy}
             required
           />
         </label>
@@ -48,6 +50,7 @@ export function RetrievePackage() {
             className={input}
             value={pickupCode}
             onChange={(e) => setPickupCode(e.target.value)}
+            disabled={busy}
             required
           />
         </label>
@@ -60,15 +63,17 @@ export function RetrievePackage() {
               className={input}
               value={simulatedNow}
               onChange={(e) => setSimulatedNow(e.target.value)}
+              disabled={busy}
             />
           </label>
         </details>
         <button type="submit" className={btnPrimary} disabled={busy}>
-          Retrieve
+          {busy && <Spinner onDark />}
+          {busy ? 'Retrieving…' : 'Retrieve'}
         </button>
       </form>
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-      {lastCharge !== null && (
+      {lastCharge !== null && !busy && (
         <p className="mt-3 text-sm text-green-800">
           Storage charge: <span className="font-semibold">{lastCharge}</span>
         </p>
