@@ -10,6 +10,7 @@ async function request<T>(
   path: string,
   init?: RequestInit
 ): Promise<{ ok: true; data: T } | { ok: false; status: number; error: ApiError }> {
+  // Keep Content-Type when we add headers (e.g. simulated retrieve time).
   const { headers: extraHeaders, ...rest } = init ?? {};
   const res = await fetch(`${base}${path}`, {
     ...rest,

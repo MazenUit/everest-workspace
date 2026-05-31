@@ -16,7 +16,7 @@ API for storing packages in lockers and retrieving them with a pickup code.
 ```
 package-locker/
   api/                 Node + Express + TypeScript
-  web/                 optional demo UI (Vite + React)
+  web/                 optional demo UI (Vite, React, Zustand, Tailwind)
   db/                  migrations + seed
   docker-compose.yml   db + api + web
 ```

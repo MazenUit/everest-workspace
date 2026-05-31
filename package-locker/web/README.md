@@ -1,10 +1,26 @@
 # Package Locker — demo UI
 
-Optional Vite + React UI. Run with the rest of the stack via Docker (see `package-locker/README.md`).
+Optional Vite + React demo. State: Zustand. Styles: Tailwind.
+
+## Layout
+
+```
+web/src/
+  api/           HTTP client
+  store/         Zustand (locker-store)
+  types/         API shapes
+  components/    screens + ErrorBoundary
+  App.tsx        page layout
+```
+
+## Run (Docker)
+
+From `package-locker/`:
 
 ```bash
-cd ..
 docker compose up --build -d
 ```
 
-Open http://localhost:5173 — requests go to the API through the compose network (`/api` → `api:3000`).
+Open http://localhost:5173
+
+See `package-locker/README.md` for migrate and seed.

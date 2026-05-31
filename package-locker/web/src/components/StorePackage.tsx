@@ -1,41 +1,34 @@
 import { useState } from 'react';
-import { storePackage } from '../api/client';
+import { useLockerStore } from '../store/locker-store';
 import type { PackageSize } from '../types';
-
-type Props = { onStored: () => void };
+import { Panel } from './Panel';
 
 const SIZES: PackageSize[] = ['SMALL', 'MEDIUM', 'LARGE'];
 
-export function StorePackage({ onStored }: Props) {
+const label = 'flex flex-col gap-1 text-sm text-zinc-700';
+const input =
+  'rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500';
+const btnPrimary =
+  'w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 sm:w-auto';
+
+export function StorePackage() {
   const [size, setSize] = useState<PackageSize>('SMALL');
-  const [message, setMessage] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ lockerId: string; pickupCode: string } | null>(
-    null
-  );
-  const [busy, setBusy] = useState(false);
+  const busy = useLockerStore((s) => s.storeBusy);
+  const error = useLockerStore((s) => s.storeError);
+  const lastStored = useLockerStore((s) => s.lastStored);
+  const storePackage = useLockerStore((s) => s.storePackage);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
-    setMessage(null);
-    setSuccess(null);
-    const result = await storePackage(size);
-    setBusy(false);
-    if (!result.ok) {
-      setMessage(result.error.message);
-      return;
-    }
-    setSuccess({ lockerId: result.data.lockerId, pickupCode: result.data.pickupCode });
-    onStored();
+    await storePackage(size);
   }
 
   return (
-    <section className="panel">
-      <h2>Store package (delivery)</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
+    <Panel title="Store package (delivery)">
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+        <label className={label}>
           Size
-          <select value={size} onChange={(e) => setSize(e.target.value as PackageSize)}>
+          <select className={input} value={size} onChange={(e) => setSize(e.target.value as PackageSize)}>
             {SIZES.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -43,21 +36,21 @@ export function StorePackage({ onStored }: Props) {
             ))}
           </select>
         </label>
-        <button type="submit" disabled={busy}>
+        <button type="submit" className={btnPrimary} disabled={busy}>
           Store
         </button>
       </form>
-      {message && <p className="error">{message}</p>}
-      {success && (
-        <div className="success">
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {lastStored && (
+        <div className="mt-3 space-y-1 rounded-md bg-green-50 p-3 text-sm text-green-800">
           <p>
-            Locker: <strong>{success.lockerId}</strong>
+            Locker: <span className="font-mono font-semibold">{lastStored.lockerId}</span>
           </p>
           <p>
-            Pickup code: <strong>{success.pickupCode}</strong>
+            Pickup code: <span className="font-mono font-semibold">{lastStored.pickupCode}</span>
           </p>
         </div>
       )}
-    </section>
+    </Panel>
   );
 }

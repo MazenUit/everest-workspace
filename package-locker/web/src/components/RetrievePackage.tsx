@@ -1,21 +1,25 @@
 import { useState } from 'react';
-import { retrievePackage } from '../api/client';
+import { useLockerStore } from '../store/locker-store';
+import { Panel } from './Panel';
 
-type Props = { onRetrieved: () => void };
+const label = 'flex flex-col gap-1 text-sm text-zinc-700';
+const input =
+  'rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500';
+const btnPrimary =
+  'w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 sm:w-auto';
 
-export function RetrievePackage({ onRetrieved }: Props) {
+export function RetrievePackage() {
   const [lockerId, setLockerId] = useState('');
   const [pickupCode, setPickupCode] = useState('');
   const [simulatedNow, setSimulatedNow] = useState('');
-  const [message, setMessage] = useState<string | null>(null);
-  const [charge, setCharge] = useState<number | null>(null);
-  const [busy, setBusy] = useState(false);
+
+  const busy = useLockerStore((s) => s.retrieveBusy);
+  const error = useLockerStore((s) => s.retrieveError);
+  const lastCharge = useLockerStore((s) => s.lastCharge);
+  const retrievePackage = useLockerStore((s) => s.retrievePackage);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
-    setMessage(null);
-    setCharge(null);
     let simulatedIso: string | undefined;
     if (simulatedNow) {
       const at = new Date(simulatedNow);
@@ -23,49 +27,52 @@ export function RetrievePackage({ onRetrieved }: Props) {
         simulatedIso = at.toISOString();
       }
     }
-    const result = await retrievePackage(lockerId.trim(), pickupCode.trim(), simulatedIso);
-    setBusy(false);
-    if (!result.ok) {
-      setMessage(result.error.message);
-      return;
-    }
-    setCharge(result.data.storageCharge);
-    onRetrieved();
+    await retrievePackage(lockerId.trim(), pickupCode.trim(), simulatedIso);
   }
 
   return (
-    <section className="panel">
-      <h2>Retrieve package (customer)</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
+    <Panel title="Retrieve package (customer)">
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+        <label className={label}>
           Locker ID
-          <input value={lockerId} onChange={(e) => setLockerId(e.target.value)} required />
+          <input
+            className={input}
+            value={lockerId}
+            onChange={(e) => setLockerId(e.target.value)}
+            required
+          />
         </label>
-        <label>
+        <label className={label}>
           Pickup code
-          <input value={pickupCode} onChange={(e) => setPickupCode(e.target.value)} required />
+          <input
+            className={input}
+            value={pickupCode}
+            onChange={(e) => setPickupCode(e.target.value)}
+            required
+          />
         </label>
-        <details>
-          <summary>Demo: simulate retrieve time (dev API only)</summary>
-          <label>
+        <details className="text-sm text-zinc-600">
+          <summary className="cursor-pointer select-none">Demo: simulate retrieve time (dev API only)</summary>
+          <label className={`${label} mt-2`}>
             Retrieve at
             <input
               type="datetime-local"
+              className={input}
               value={simulatedNow}
               onChange={(e) => setSimulatedNow(e.target.value)}
             />
           </label>
         </details>
-        <button type="submit" disabled={busy}>
+        <button type="submit" className={btnPrimary} disabled={busy}>
           Retrieve
         </button>
       </form>
-      {message && <p className="error">{message}</p>}
-      {charge !== null && (
-        <p className="success">
-          Storage charge: <strong>{charge}</strong>
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {lastCharge !== null && (
+        <p className="mt-3 text-sm text-green-800">
+          Storage charge: <span className="font-semibold">{lastCharge}</span>
         </p>
       )}
-    </section>
+    </Panel>
   );
 }

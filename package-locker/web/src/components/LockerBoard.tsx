@@ -1,62 +1,52 @@
-import { useCallback, useEffect, useState } from 'react';
-import { listLockers } from '../api/client';
-import type { Locker } from '../types';
+import { useLockerStore } from '../store/locker-store';
+import { Panel } from './Panel';
 
-type Props = { refreshKey: number };
+const btn =
+  'rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50';
 
-export function LockerBoard({ refreshKey }: Props) {
-  const [lockers, setLockers] = useState<Locker[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    const result = await listLockers();
-    setLoading(false);
-    if (!result.ok) {
-      setError(result.error.message);
-      return;
-    }
-    setLockers(result.data.lockers);
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load, refreshKey]);
+export function LockerBoard() {
+  const lockers = useLockerStore((s) => s.lockers);
+  const loading = useLockerStore((s) => s.lockersLoading);
+  const error = useLockerStore((s) => s.lockersError);
+  const fetchLockers = useLockerStore((s) => s.fetchLockers);
 
   return (
-    <section className="panel">
-      <div className="panel-head">
-        <h2>Lockers</h2>
-        <button type="button" onClick={load} disabled={loading}>
+    <Panel
+      title="Lockers"
+      action={
+        <button type="button" className={btn} onClick={() => fetchLockers()} disabled={loading}>
           Refresh
         </button>
-      </div>
-      {error && <p className="error">{error}</p>}
-      {loading && !error && <p>Loading…</p>}
+      }
+    >
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      {loading && !error && <p className="text-sm text-zinc-500">Loading…</p>}
       {!loading && !error && (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Size</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lockers.map((l) => (
-              <tr key={l.id}>
-                <td>{l.id}</td>
-                <td>{l.size}</td>
-                <td className={l.isAvailable ? 'ok' : 'busy'}>
-                  {l.isAvailable ? 'Available' : 'In use'}
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[280px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-zinc-200 text-zinc-600">
+                <th className="py-2 pr-4 font-medium">ID</th>
+                <th className="py-2 pr-4 font-medium">Size</th>
+                <th className="py-2 font-medium">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {lockers.map((l) => (
+                <tr key={l.id} className="border-b border-zinc-100">
+                  <td className="py-2 pr-4 font-mono">{l.id}</td>
+                  <td className="py-2 pr-4">{l.size}</td>
+                  <td
+                    className={`py-2 font-medium ${l.isAvailable ? 'text-green-700' : 'text-amber-700'}`}
+                  >
+                    {l.isAvailable ? 'Available' : 'In use'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
-    </section>
+    </Panel>
   );
 }
