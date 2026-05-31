@@ -16,8 +16,14 @@ export function RetrievePackage({ onRetrieved }: Props) {
     setBusy(true);
     setMessage(null);
     setCharge(null);
-    const iso = simulatedNow ? new Date(simulatedNow).toISOString() : undefined;
-    const result = await retrievePackage(lockerId.trim(), pickupCode.trim(), iso);
+    let simulatedIso: string | undefined;
+    if (simulatedNow) {
+      const at = new Date(simulatedNow);
+      if (!Number.isNaN(at.getTime())) {
+        simulatedIso = at.toISOString();
+      }
+    }
+    const result = await retrievePackage(lockerId.trim(), pickupCode.trim(), simulatedIso);
     setBusy(false);
     if (!result.ok) {
       setMessage(result.error.message);

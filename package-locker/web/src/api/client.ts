@@ -10,9 +10,13 @@ async function request<T>(
   path: string,
   init?: RequestInit
 ): Promise<{ ok: true; data: T } | { ok: false; status: number; error: ApiError }> {
+  const { headers: extraHeaders, ...rest } = init ?? {};
   const res = await fetch(`${base}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-    ...init,
+    ...rest,
+    headers: {
+      'Content-Type': 'application/json',
+      ...extraHeaders,
+    },
   });
   const body = await parseJson<ApiError & T>(res);
   if (!res.ok) {
