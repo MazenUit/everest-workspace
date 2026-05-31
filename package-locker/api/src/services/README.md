@@ -1,17 +1,23 @@
-## Services: coordinates several domain pieces and changes state (busy locker, used codes).
+## Services
 
-## flow
+`LockerStation` — list, store, retrieve. Calls repos + domain rules (allocator, pickup code, charge).
 
-storePackage(MEDIUM)
-       │
-       ▼
-findSmallestAvailableLocker ──► null ──► { ok: false, NO_SUITABLE_LOCKER }
-       │
-       ▼ locker (e.g. M1)
-createUniquePickupCode() ──► "A1B2C3"
-       │
-       ▼
-M1.isAvailable = false
-       │
-       ▼
-{ ok: true, lockerId: "M1", pickupCode: "A1B2C3" }
+## Store flow
+
+```
+storePackage(size)
+  → withTransaction
+  → listLockersForUpdate + findSmallestAvailableLocker
+  → markUnavailable + insert assignment
+  → COMMIT
+```
+
+## Retrieve flow
+
+```
+retrievePackage(lockerId, code)
+  → lockerExists (404 if missing)
+  → withTransaction
+  → findActiveForLocker + validate code
+  → calculateStorageCharge + markRetrieved + markAvailable
+```

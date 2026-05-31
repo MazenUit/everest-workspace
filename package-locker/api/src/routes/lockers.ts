@@ -16,54 +16,63 @@ import {
 export function createLockersRouter(station: LockerStation): Router {
   const router = Router();
 
-  router.get('/lockers', (_req: Request, res: Response) => {
-    res.json({ lockers: station.listLockers() });
+  router.get('/lockers', async (_req: Request, res: Response) => {
+    try {
+      const lockers = await station.listLockers();
+      res.json({ lockers });
+    } catch {
+      res.status(500).json({ message: 'Failed to load lockers' });
+    }
   });
 
-  router.post('/packages/store', (req: Request, res: Response) => {
+  router.post('/packages/store', async (req: Request, res: Response) => {
     const packageSize = parsePackageSize(req.body?.packageSize);
-
     if (packageSize === null) {
       sendBadSize(res);
       return;
     }
 
-    const result = station.storePackage(packageSize);
-
-    if (!result.ok) {
-      sendNoLocker(res, result.reason);
-      return;
+    try {
+      const result = await station.storePackage(packageSize);
+      if (!result.ok) {
+        sendNoLocker(res, result.reason);
+        return;
+      }
+      sendStored(res, result.lockerId, result.pickupCode);
+    } catch {
+      res.status(500).json({ message: 'Failed to store package' });
     }
-
-    sendStored(res, result.lockerId, result.pickupCode);
   });
 
-  router.post('/lockers/:lockerId/retrieve', (req: Request, res: Response) => {
-
+  router.post('/lockers/:lockerId/retrieve', async (req: Request, res: Response) => {
     const pickupCode = parsePickupCode(req.body?.pickupCode);
-    
     if (pickupCode === null) {
       sendMissingPickupCode(res);
       return;
     }
-  
+
     const devRetrieveTime = getDevRetrieveTime(req);
-    const result = station.retrievePackage(
-      req.params.lockerId,
-      pickupCode,
-      devRetrieveTime
-    );
-  
-    if (!result.ok) {
-      if (result.reason === 'INVALID_PICKUP') {
-        sendInvalidPickup(res);
+
+    try {
+      const result = await station.retrievePackage(
+        req.params.lockerId,
+        pickupCode,
+        devRetrieveTime
+      );
+
+      if (!result.ok) {
+        if (result.reason === 'INVALID_PICKUP') {
+          sendInvalidPickup(res);
+          return;
+        }
+        sendRetrieveNotFound(res, result.reason);
         return;
       }
-      sendRetrieveNotFound(res, result.reason);
-      return;
+
+      sendRetrieved(res, result.lockerId, result.storageCharge);
+    } catch {
+      res.status(500).json({ message: 'Failed to retrieve package' });
     }
-  
-    sendRetrieved(res, result.lockerId, result.storageCharge);
   });
 
   return router;

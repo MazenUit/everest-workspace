@@ -1,19 +1,29 @@
 # Infrastructure
 
-Talks to Postgres.
+Postgres access only — SQL and row mapping live here.
 
-## What is here
+## Files
 
-db.ts — one pool for all DB access; startup ping proves Postgres is reachable before we accept HTTP traffic
+- `db.ts` — pool, startup ping, `withTransaction`
+- `locker-repository.ts` — `lockers` table
+- `package-assignment-repository.ts` — `package_assignments` table
 
 ## Flow
 
-main.ts starts
-  → checkDatabaseConnection()
-  → API listens on PORT
-  → routes still use in-memory LockerStation until repository is wired
+```
+Routes → LockerStation → withTransaction → repos → Postgres
+```
 
-## check connection 
-```bash 
+## Repositories
+
+| Interface | Table | Implementation |
+|-----------|--------|----------------|
+| `LockerRepository` | `lockers` | `PostgresLockerRepository` |
+| `PackageAssignmentRepository` | `package_assignments` | `PostgresPackageAssignmentRepository` |
+
+## Debug
+
+```bash
 docker compose logs api
+docker compose exec db psql -U everest -d everest_locker -c "SELECT * FROM lockers;"
 ```

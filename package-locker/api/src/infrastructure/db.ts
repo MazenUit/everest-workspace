@@ -1,5 +1,6 @@
 // pool to connect API to PostgreSQL and runs queries.
-import { Pool } from 'pg';
+// PoolClient
+import { Pool, PoolClient } from 'pg';
 import { config } from '../config';
 
 let pool: Pool | null = null;
@@ -21,6 +22,30 @@ export async function checkDatabaseConnection(): Promise<void> {
   try {
     await client.query('SELECT 1');
   } finally {
+    client.release();
+  }
+}
+
+// store and retrieve touch lockers + package_assignments; both must commit or neither does.
+export async function withTransaction<T>(
+  fn: (client: PoolClient) => Promise<T>
+): Promise<T> {
+  // get one connection from the pool
+  const client = await getPool().connect();
+  try {
+    // start transaction
+    await client.query('BEGIN');
+    // store/retrieve logic runs
+    const result = await fn(client);
+    // persist all changes
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    // undo partial work
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    // return connection to pool
     client.release();
   }
 }
