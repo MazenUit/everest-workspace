@@ -1,11 +1,10 @@
 # Package Locker — demo UI
 
-Optional Vite + React UI for manual demos. All rules live in the API.
+Optional Vite + React UI. Run with the rest of the stack via Docker (see `package-locker/README.md`).
 
 ```bash
-cp .env.example .env
-npm install
-npm run dev
+cd ..
+docker compose up --build -d
 ```
 
-Requires the API on port 3000 (`package-locker/api` or Docker). Requests use `/api` (proxied in `vite.config.ts`).
+Open http://localhost:5173 — requests go to the API through the compose network (`/api` → `api:3000`).

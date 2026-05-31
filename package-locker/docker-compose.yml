@@ -29,5 +29,25 @@ services:
       db:
         condition: service_healthy
 
+  web:
+    build: ./web
+    ports:
+      - "5173:5173"
+    environment:
+      API_PROXY_TARGET: http://api:3000
+    volumes:
+      - ./web/src:/app/src
+      - ./web/index.html:/app/index.html
+    depends_on:
+      - api
+
+  api-test:
+    profiles: ["test"]
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./api:/app
+    command: sh -c "npm ci && npm test"
+
 volumes:
   postgres_data:
