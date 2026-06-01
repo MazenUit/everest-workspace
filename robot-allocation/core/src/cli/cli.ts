@@ -1,12 +1,14 @@
-// Read inventory and client hours from stdin. Business rules stay in domain/services.
+// prompts for inventory + hours, then calls the service for the chosen level
 
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { RobotInventory } from '../domain/allocation-types';
 import { ROBOT_CATEGORIES } from '../domain/robots';
 import { runLevel1 } from '../services/level-1';
+import { runLevel2 } from '../services/level-2';
 import { c } from './colors';
-import { printResult } from './output';
+import { printLevel2Result, printResult } from './output';
+import { CliLevel } from './parse-level';
 
 function readInt(line: string, min: number): number | null {
   const n = Number(line.trim());
@@ -17,8 +19,7 @@ function isExit(line: string): boolean {
   return line.trim().toLowerCase() === 'exit';
 }
 
-// One allocation round; false when the user types exit
-async function runRound(rl: readline.Interface): Promise<boolean> {
+async function runRound(rl: readline.Interface, level: CliLevel): Promise<boolean> {
   console.log(c.prompt('Enter number of robots available:'));
 
   const inventory = {} as RobotInventory;
@@ -44,20 +45,24 @@ async function runRound(rl: readline.Interface): Promise<boolean> {
   }
 
   console.log('');
-  printResult(runLevel1(inventory, hours));
+  if (level === 1) {
+    printResult(runLevel1(inventory, hours));
+  } else {
+    printLevel2Result(runLevel2(inventory, hours));
+  }
   console.log('');
   return true;
 }
 
-export async function runCli(): Promise<void> {
+export async function runCli(level: CliLevel): Promise<void> {
   const rl = readline.createInterface({ input: stdin, output: stdout });
 
   try {
-    console.log(c.prompt('\nEverBot — Robot Work Allocation\n'));
+    console.log(c.prompt(`\nEverBot — Level ${level}\n`));
     console.log(c.hint('Type exit at any prompt to end the session.\n'));
 
-    while (await runRound(rl)) {
-      // next allocation
+    while (await runRound(rl, level)) {
+      // next round
     }
   } finally {
     rl.close();

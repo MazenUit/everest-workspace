@@ -1,11 +1,18 @@
 ## Domain
 
-Robot specs and allocation rules for levels 1–4.
+The business rules for robot allocation — hours, cost, and which robots to send. This layer does not prompt the user or print results; `cli/` handles that. Same split as `package-locker/api/src/domain/`.
 
-## Files
+## Layout
 
-| File | Role |
-|------|------|
-| `robots.ts` | Bravo / Charlie / Delta — hours per day and charging cost |
-| `allocation-types.ts` | Inventory, assignment, result types |
-| `category-distribution.ts` | Level 1 allocation |
+```
+domain/
+  robots.ts
+  allocation-types.ts
+  shared/assignment-helpers.ts
+  level1/     allocate.ts, grow-plan.ts, pick-next.ts
+  level2/     each-mix → pick-cheapest → allocate.ts
+  level3/     (later)
+  level4/     (later)
+```
+
+Before changing logic, read **`level1/rules.ts`** or **`level2/rules.ts`** (`LEVEL_1_RULES` / `LEVEL_2_RULES`). Each level’s README links there too.

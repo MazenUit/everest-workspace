@@ -1,33 +1,21 @@
 ## CLI
 
-Read input → call `services/level-N` → print result. No allocation rules here.
+Reads stdin, calls `runLevel1` or `runLevel2`, prints stdout. No business rules in this folder.
 
-## Development
+## Run
 
 From `robot-allocation/`:
 
 ```bash
-npm install
-npm run test
-npm run cli
+npm run cli:level1
+npm run cli:level2
 ```
 
 ## Files
 
 | File | Role |
 |------|------|
-| `main.ts` | Starts the app |
-| `cli.ts` | Session loop until `exit` |
-| `colors.ts` | Orange / green / white terminal theme |
-| `output.ts` | Prints assignment or challenge error text |
-
-## Session
-
-Runs until you type `exit` at any prompt. Orange = prompts and headings, green = input labels, white = result lines.
-
-## Flow
-
-```
-cli.ts  →  services  →  output.ts
- read         rules        print
-```
+| `main.ts` | reads level from npm script (`1` or `2`) |
+| `cli.ts` | prompt loop until `exit` |
+| `output.ts` | challenge text for success and errors |
+| `colors.ts` | orange / green / white |

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { allocateCategoryDistribution } from '../domain/category-distribution';
+import { allocateCategoryDistribution } from '../../domain/level1/allocate';
 
 const stock = { Bravo: 2, Charlie: 3, Delta: 2 };
 

@@ -1,10 +1,14 @@
-// Print assignment or challenge error text (stdout boundary).
+// maps domain results to the exact lines the challenge expects on stdout
 
-import { AllocationResult, AllocationFailureReason } from '../domain/allocation-types';
+import {
+  AllocationFailureReason,
+  AllocationResult,
+  CostOptimizationResult,
+  RobotAssignment,
+} from '../domain/allocation-types';
 import { ROBOT_CATEGORIES } from '../domain/robots';
 import { c } from './colors';
 
-// Map domain failure reasons to the exact messages reviewers expect
 const ERRORS: Record<AllocationFailureReason, string> = {
   NO_ROBOTS: 'Error: No robots available for assignment.',
   IMPOSSIBLE_CATEGORY:
@@ -12,16 +16,32 @@ const ERRORS: Record<AllocationFailureReason, string> = {
   INVALID_HOURS: 'Error: Work hours must be a positive integer.',
 };
 
+function printAssignment(title: string, assignment: RobotAssignment): void {
+  console.log(c.prompt(title));
+  for (const cat of ROBOT_CATEGORIES) {
+    console.log(c.value(`${cat}: ${assignment[cat]}`));
+  }
+}
+
 export function printResult(result: AllocationResult): void {
   if (!result.ok) {
     console.log(c.error(ERRORS[result.reason]));
     return;
   }
 
-  console.log(c.prompt('Robot Assignment'));
-  for (const cat of ROBOT_CATEGORIES) {
-    console.log(c.value(`${cat}: ${result.assignment[cat]}`));
-  }
+  printAssignment('Robot Assignment', result.assignment);
   console.log(c.value(`Total Work Hours Provided: ${result.hoursProvided}`));
   console.log(c.value(`Client Work Hours Requested: ${result.hoursRequested}`));
+}
+
+export function printLevel2Result(result: CostOptimizationResult): void {
+  if (!result.ok) {
+    console.log(c.error(ERRORS[result.reason]));
+    return;
+  }
+
+  printAssignment('Robot Assignment', result.assignment);
+  console.log(c.value(`Total Work Hours Provided: ${result.hoursProvided}`));
+  console.log(c.value(`Client Work Hours Requested: ${result.hoursRequested}`));
+  console.log(c.value(`Total Charging Cost: $${result.chargingCost}`));
 }
