@@ -13,7 +13,6 @@ function addRobot(
   return { ...plan, [robotType]: plan[robotType] + 1 };
 }
 
-// loop: add robots until hours provided >= hours wanted
 export function growUntilEnoughHours(
   plan: RobotAssignment,
   stock: RobotInventory,

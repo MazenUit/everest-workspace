@@ -3,9 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm install --prefix core",
-    "test": "npm --prefix core run test",
-    "cli:level1": "npm --prefix core run cli:level1",
-    "cli:level2": "npm --prefix core run cli:level2"
+    "test": "tsc && node --test dist/tests/robots.test.js dist/tests/level1/*.test.js dist/tests/level2/*.test.js dist/tests/compare/*.test.js",
+    "cli:level1": "tsx src/cli/main.ts 1",
+    "cli:level2": "tsx src/cli/main.ts 2",
+    "cli:compare": "tsx src/cli/main.ts compare"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

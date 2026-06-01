@@ -1,6 +1,6 @@
 ## Tests
 
-Domain tests with `node:test`. Run from `robot-allocation/`:
+Domain tests with `node:test`. Run from `robot-allocation/` (`level1/`, `level2/`, `compare/`):
 
 ```bash
 npm run test
