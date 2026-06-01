@@ -1,0 +1,10 @@
+{
+  "name": "robot-allocation",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install --prefix core",
+    "test": "npm --prefix core run test",
+    "cli": "npm --prefix core run cli"
+  }
+}

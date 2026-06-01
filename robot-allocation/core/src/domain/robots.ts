@@ -15,5 +15,5 @@ export const ROBOT_SPECS: Record<RobotCategory, RobotSpec> = {
   Delta: { category: 'Delta', hoursPerDay: 8, chargingCostPerDay: 4 },
 };
 
-/** Order matters: Bravo < Charlie < Delta for capacity and Level 1 category checks */
+/** Order matters: index 0 < 1 < 2 for capacity and category checks */
 export const ROBOT_CATEGORIES: RobotCategory[] = ['Bravo', 'Charlie', 'Delta'];
