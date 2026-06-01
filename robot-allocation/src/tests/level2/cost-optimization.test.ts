@@ -36,4 +36,11 @@ describe('allocateCostOptimization', () => {
     if (result.ok) return;
     assert.equal(result.reason, 'INVALID_HOURS');
   });
+
+  it('stock too small to meet requested hours', () => {
+    const result = allocateCostOptimization({ Bravo: 1, Charlie: 0, Delta: 0 }, 100);
+    assert.equal(result.ok, false);
+    if (result.ok) return;
+    assert.equal(result.reason, 'NO_ROBOTS');
+  });
 });

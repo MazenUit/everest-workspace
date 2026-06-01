@@ -15,4 +15,4 @@ domain/
   level4/     (later)
 ```
 
-Before changing logic, read **`level1/rules.ts`** or **`level2/rules.ts`** (`LEVEL_1_RULES` / `LEVEL_2_RULES`). Each level’s README links there too.
+Before changing logic, read **`level1/rules.ts`**, **`level2/rules.ts`**, or **`compare/rules.ts`**. Each folder’s README links there too.

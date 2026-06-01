@@ -12,14 +12,15 @@ Terminal app for EverBot — assign Bravo, Charlie, and Delta robots to client w
 
 ```
 robot-allocation/
-  core/src/
+  src/
     domain/
       robots.ts
       allocation-types.ts
       shared/           helpers (hours, cost totals)
       level1/           rules.ts, allocate, grow-plan, pick-next
       level2/           rules.ts, each-mix, pick-cheapest, allocate
-    services/           level-1.ts, level-2.ts, …
+      compare/          rules.ts, metrics (level 1 vs 2)
+    services/           level-1.ts, level-2.ts, compare.ts, …
     cli/                prompts + print
     tests/level1/       level 1 tests
     tests/level2/       level 2 tests
@@ -44,6 +45,7 @@ npm install
 npm run test
 npm run cli:level1
 npm run cli:level2
+npm run cli:compare
 ```
 
 Type `exit` at any prompt to quit.
@@ -52,9 +54,9 @@ Type `exit` at any prompt to quit.
 
 ## Level 2 — cost optimization (this branch)
 
-**Rules in code:** `core/src/domain/level2/rules.ts` (`LEVEL_2_RULES`)
+**Rules in code:** `src/domain/level2/rules.ts` (`LEVEL_2_RULES`)
 
-**Code:** `core/src/domain/level2/allocate.ts` → `services/level-2.ts`
+**Code:** `src/domain/level2/allocate.ts` → `services/level-2.ts`
 
 ### Try it — 20 hours
 
@@ -92,12 +94,37 @@ Same messages as level 1 where they apply (`NO_ROBOTS`, `INVALID_HOURS`). Level 
 
 ## Level 1 — category distribution
 
-**Rules in code:** `core/src/domain/level1/rules.ts` (`LEVEL_1_RULES`)
+**Rules in code:** `src/domain/level1/rules.ts` (`LEVEL_1_RULES`)
 
-See also `core/src/domain/level1/README.md`.
+See also `src/domain/level1/README.md`.
 
 ```bash
 npm run cli:level1
+```
+
+---
+
+## Compare — level 1 vs level 2
+
+**Rules in code:** `src/domain/compare/rules.ts` (`LEVEL_COMPARE_RULES`)
+
+- **`npm run cli:level2`** — level 2 assignment, then comparison + insight (additional requirement)
+- **`npm run cli:compare`** — comparison + insight only (title: *Level 1 vs Level 2 Comparison*)
+
+```bash
+npm run cli:level2
+npm run cli:compare
+```
+
+Example (stock 2 / 3 / 2, 20 hours):
+
+```
+Level 1 Cost: $12
+Level 2 Cost: $11
+Cost Difference: $1
+
+Insight:
+Level 1 strategy resulted in $1 additional cost due to mandatory usage of multiple robot categories.
 ```
 
 ---
@@ -108,4 +135,3 @@ npm run cli:level1
 |------:|--------|--------|
 | 3 | `domain/level3/` | Standby activation |
 | 4 | `domain/level4/` | Multiple clients |
-| — | CLI | Level 1 vs 2 comparison (separate branch) |

@@ -13,7 +13,6 @@ export type AllocationFailure = {
   reason: AllocationFailureReason;
 };
 
-// level 1 success shape (hours only on the printed output)
 export type AllocationSuccess = {
   ok: true;
   assignment: RobotAssignment;
@@ -24,7 +23,6 @@ export type AllocationSuccess = {
 
 export type AllocationResult = AllocationSuccess | AllocationFailure;
 
-// level 2 success shape — same hours fields plus charging cost
 export type CostOptimizationSuccess = AllocationSuccess & {
   chargingCost: number;
 };
