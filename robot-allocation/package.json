@@ -5,6 +5,7 @@
   "scripts": {
     "postinstall": "npm install --prefix core",
     "test": "npm --prefix core run test",
-    "cli": "npm --prefix core run cli"
+    "cli:level1": "npm --prefix core run cli:level1",
+    "cli:level2": "npm --prefix core run cli:level2"
   }
 }

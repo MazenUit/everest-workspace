@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-// Terminal colors — orange prompts, green labels, white values (challenge layout)
+// terminal theme for reviewers (orange prompts, green labels, white values)
 export const c = {
   prompt: chalk.hex('#E8A317'),
   label: chalk.green,

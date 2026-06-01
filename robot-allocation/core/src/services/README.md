@@ -1,21 +1,10 @@
 ## Services
 
-Orchestrates allocation use cases per level.
+Thin wrappers: call domain code, return the result. No allocation rules here.
 
-## Levels
+| File | Calls |
+|------|--------|
+| `level-1.ts` | `domain/level1/allocate.ts` |
+| `level-2.ts` | `domain/level2/allocate.ts` |
 
-| Level | Strategy |
-|-------|----------|
-| 1 | Category distribution — multi-category when possible, min excess hours |
-| 2 | Cost optimization — min charging cost; compare with level 1 |
-| 3 | Standby activation — extra robots when active fleet is not enough |
-| 4 | Multiple clients — priority by requested hours |
-
-## Flow (target shape)
-
-```
-allocate(request, inventory)
-  → pick strategy for level
-  → domain rules (counts, hours, cost)
-  → result (assignment + totals)
-```
+Add `level-3.ts` when standby logic lives in `domain/level3/`.

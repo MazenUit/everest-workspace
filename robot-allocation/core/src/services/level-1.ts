@@ -1,7 +1,7 @@
-import { allocateCategoryDistribution } from '../domain/category-distribution';
+import { allocateCategoryDistribution } from '../domain/level1/allocate';
 import { AllocationResult, RobotInventory } from '../domain/allocation-types';
 
-/** Use case: category distribution */
+/** level 1 — category distribution. Rules: ../domain/level1/rules.ts */
 export function runLevel1(
   inventory: RobotInventory,
   hoursRequested: number

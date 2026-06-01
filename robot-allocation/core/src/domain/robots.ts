@@ -1,4 +1,4 @@
-// EverBot fleet. Each robot can be assigned once per allocation for up to hoursPerDay, then it recharges.
+// everBot fleet — each physical robot works up to hoursPerDay, then recharges
 
 export type RobotCategory = 'Bravo' | 'Charlie' | 'Delta';
 
@@ -8,12 +8,12 @@ export interface RobotSpec {
   chargingCostPerDay: number;
 }
 
-/** Company table — hours and charging cost per robot type */
+/** company table: hours and $/day per type */
 export const ROBOT_SPECS: Record<RobotCategory, RobotSpec> = {
   Bravo: { category: 'Bravo', hoursPerDay: 3, chargingCostPerDay: 2 },
   Charlie: { category: 'Charlie', hoursPerDay: 5, chargingCostPerDay: 3 },
   Delta: { category: 'Delta', hoursPerDay: 8, chargingCostPerDay: 4 },
 };
 
-/** Order matters: index 0 < 1 < 2 for capacity and category checks */
+/** order matters: Bravo (0) < Charlie (1) < Delta (2) for level 1 checks */
 export const ROBOT_CATEGORIES: RobotCategory[] = ['Bravo', 'Charlie', 'Delta'];
