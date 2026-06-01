@@ -2,18 +2,9 @@
  * Level 2 entry — cost optimization.
  * @see ./rules.ts — business rules for this level
  */
-import {
-  CostOptimizationResult,
-  RobotAssignment,
-  RobotInventory,
-} from '../allocation-types';
-import {
-  chargingCostForAssignment,
-  hoursForAssignment,
-  totalInventory,
-} from '../shared/assignment-helpers';
-import { eachPossibleMix } from './each-mix';
-import { cheaperPlan } from './pick-cheapest';
+import { CostOptimizationResult, RobotInventory } from '../allocation-types';
+import { chargingCostForAssignment, hoursForAssignment, totalInventory } from '../shared/assignment-helpers';
+import { findCheapestMix } from '../shared/find-cheapest-mix';
 
 export function allocateCostOptimization(
   stock: RobotInventory,
@@ -26,14 +17,7 @@ export function allocateCostOptimization(
     return { ok: false, reason: 'NO_ROBOTS' };
   }
 
-  let bestPlan: RobotAssignment | null = null;
-
-  for (const candidate of eachPossibleMix(stock)) {
-    if (hoursForAssignment(candidate) < hoursRequested) continue;
-    if (bestPlan === null || cheaperPlan(candidate, bestPlan, hoursRequested)) {
-      bestPlan = candidate;
-    }
-  }
+  const bestPlan = findCheapestMix(stock, hoursRequested);
 
   if (bestPlan === null) {
     return { ok: false, reason: 'NO_ROBOTS' };

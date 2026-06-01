@@ -32,3 +32,20 @@ export type CostOptimizationResult = CostOptimizationSuccess | AllocationFailure
 export function emptyAssignment(): RobotAssignment {
   return { Bravo: 0, Charlie: 0, Delta: 0 };
 }
+
+// level 3 — standby activation
+export type StandbyActivationSuccess = {
+  ok: true;
+  activeCapacity: number;
+  hoursRequested: number;
+  standbyRequired: boolean;
+  standbyAssignment: RobotAssignment;
+  standbyCost: number;
+};
+
+export type StandbyActivationFailure = {
+  ok: false;
+  reason: 'INVALID_HOURS';
+};
+
+export type StandbyActivationResult = StandbyActivationSuccess | StandbyActivationFailure;
