@@ -17,7 +17,7 @@ robot-allocation/
     src/tests/          unit tests
     Dockerfile
   web/                  demo UI (later)
-  docker-compose.yml    core + test profile
+  docker-compose.yml    core + test   profile
 ```
 
 ## Run locally (Docker only)
