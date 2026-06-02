@@ -64,6 +64,31 @@ export async function readHours(
   return hours;
 }
 
+export async function readClientHours(
+  rl: readline.Interface
+): Promise<number[] | 'exit' | 'retry'> {
+  const line = await rl.question(c.prompt('\nEnter client work hours: '));
+  if (isExit(line)) return 'exit';
+
+  const parts = line.trim().split(/[\s,]+/).filter(Boolean);
+  if (parts.length === 0) {
+    console.log(c.error('Error: At least one client work hours value required.'));
+    return 'retry';
+  }
+
+  const hours: number[] = [];
+  for (const part of parts) {
+    const n = readInt(part, 1);
+    if (n === null) {
+      console.log(c.error('Error: Each client work hours must be a positive integer.'));
+      return 'retry';
+    }
+    hours.push(n);
+  }
+
+  return hours;
+}
+
 export async function readInventoryAndHours(
   rl: readline.Interface
 ): Promise<ReadInputResult> {

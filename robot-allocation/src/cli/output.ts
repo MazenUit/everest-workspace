@@ -3,6 +3,7 @@ import { buildCompareMetrics, LevelCompareInput } from '../domain/compare/metric
 import {
   AllocationResult,
   CostOptimizationResult,
+  MultiClientResult,
   RobotAssignment,
   StandbyActivationResult,
 } from '../domain/allocation-types';
@@ -82,4 +83,30 @@ export function printCompareResult(input: LevelCompareInput): void {
   if (!level2.ok) { printLevel2Result(level2); return; }
 
   printCostComparison(input);
+}
+
+export function printLevel4Result(result: MultiClientResult): void {
+  if (!result.ok) { console.log(c.error(ERRORS[result.reason])); return; }
+
+  const total = result.allocations.length;
+  console.log(c.prompt(`Processing ${total} client${total !== 1 ? 's' : ''} (sorted by hours: highest first)\n`));
+
+  result.allocations.forEach((allocation, index) => {
+    console.log(c.prompt(`Client ${index + 1} — ${allocation.hoursRequested} hours`));
+
+    if (allocation.servedByActive) {
+      printAssignment('Robot Assignment (Active):', allocation.assignment);
+      console.log(c.value(`Charging Cost: $${allocation.chargingCost}`));
+    } else {
+      console.log(c.prompt('Standby Required:'));
+      for (const cat of ROBOT_CATEGORIES) {
+        const count = allocation.standbyAssignment[cat];
+        if (count > 0) {
+          console.log(c.value(`${cat}: ${count} - cost $${count * ROBOT_SPECS[cat].chargingCostPerDay}`));
+        }
+      }
+    }
+
+    if (index < total - 1) console.log('');
+  });
 }

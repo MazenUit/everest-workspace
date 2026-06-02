@@ -4,15 +4,17 @@ import { runCompare } from '../services/compare';
 import { runLevel1 } from '../services/level-1';
 import { runLevel2 } from '../services/level-2';
 import { runLevel3 } from '../services/level-3';
+import { runLevel4 } from '../services/level-4';
 import { c } from './colors';
 import {
   printCostComparison,
   printCompareResult,
   printLevel2Result,
   printLevel3Result,
+  printLevel4Result,
   printResult,
 } from './output';
-import { readHours, readInventoryAndHours, readRobotCounts } from './prompts.js';
+import { readClientHours, readHours, readInventoryAndHours, readRobotCounts } from './prompts.js';
 
 type SessionTick = (rl: readline.Interface) => Promise<'exit' | 'next'>;
 
@@ -81,6 +83,23 @@ export function runLevel3Cli(): Promise<void> {
 
     console.log('');
     printLevel3Result(runLevel3(activeResult.inventory, hoursResult));
+    console.log('');
+    return 'next';
+  });
+}
+
+export function runLevel4Cli(): Promise<void> {
+  return runSession('EverBot — Level 4 (Multi-Client Allocation)', async (rl) => {
+    const countsResult = await readRobotCounts(rl, 'Enter number of robots available:');
+    if (countsResult.status === 'exit') return 'exit';
+    if (countsResult.status === 'retry') return 'next';
+
+    const hoursResult = await readClientHours(rl);
+    if (hoursResult === 'exit') return 'exit';
+    if (hoursResult === 'retry') return 'next';
+
+    console.log('');
+    printLevel4Result(runLevel4(countsResult.inventory, hoursResult));
     console.log('');
     return 'next';
   });
