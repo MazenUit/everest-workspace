@@ -6,7 +6,8 @@ export type RobotAssignment = Record<RobotCategory, number>;
 export type AllocationFailureReason =
   | 'NO_ROBOTS'
   | 'IMPOSSIBLE_CATEGORY'
-  | 'INVALID_HOURS';
+  | 'INVALID_HOURS'
+  | 'INSUFFICIENT_INVENTORY';
 
 export type AllocationFailure = {
   ok: false;

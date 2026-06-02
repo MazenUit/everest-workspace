@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "tsc && node --test dist/tests/robots.test.js dist/tests/level1/*.test.js dist/tests/level2/*.test.js dist/tests/compare/*.test.js dist/tests/level3/*.test.js dist/tests/level4/*.test.js",
+    "test": "tsc && node --test dist/tests/robots.test.js dist/tests/error-boundary.test.js dist/tests/level1/*.test.js dist/tests/level2/*.test.js dist/tests/compare/*.test.js dist/tests/level3/*.test.js dist/tests/level4/*.test.js",
     "cli:level1": "tsx src/cli/main.ts 1",
     "cli:level2": "tsx src/cli/main.ts 2",
     "cli:level3": "tsx src/cli/main.ts 3",
