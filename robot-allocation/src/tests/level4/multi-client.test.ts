@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { allocateMultiClient } from '../../domain/level4/allocate';
+import { buildSummary } from '../../domain/level4/summary';
 
 describe('allocateMultiClient', () => {
   it('single client served by active inventory', () => {
@@ -104,5 +105,59 @@ describe('allocateMultiClient', () => {
     assert.equal(result.allocations[0].servedByActive, false);
     assert.equal(result.allocations[1].servedByActive, true);
     assert.equal(result.allocations[2].servedByActive, true);
+  });
+});
+
+describe('buildSummary', () => {
+  it('single active allocation — full utilization', () => {
+    // Delta×1 = 8h exact, hoursRequested=8 → 100% utilization, Delta=100%
+    const result = allocateMultiClient({ Bravo: 0, Charlie: 0, Delta: 1 }, [8]);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    const summary = buildSummary(result.allocations);
+    assert.equal(summary.totalRobotsUsed, 1);
+    assert.equal(summary.totalChargingCost, 4);
+    assert.equal(summary.avgUtilizationPct, 100);
+    assert.equal(summary.categoryUtilizationPct.Bravo, 0);
+    assert.equal(summary.categoryUtilizationPct.Charlie, 0);
+    assert.equal(summary.categoryUtilizationPct.Delta, 100);
+  });
+
+  it('active + standby mix — totals and utilization', () => {
+    // inventory: 1 Delta — clients [8, 5]
+    // client 8h: active Delta×1 = 8h $4, 100% utilization
+    // client 5h: standby Charlie×1 = 5h $3, 100% utilization
+    const result = allocateMultiClient({ Bravo: 0, Charlie: 0, Delta: 1 }, [8, 5]);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    const summary = buildSummary(result.allocations);
+    assert.equal(summary.totalRobotsUsed, 2);
+    assert.equal(summary.totalChargingCost, 7);
+    assert.equal(summary.avgUtilizationPct, 100);
+    // Delta: 8h/13h, Charlie: 5h/13h → 62% and 38%
+    assert.equal(summary.categoryUtilizationPct.Delta, 62);
+    assert.equal(summary.categoryUtilizationPct.Charlie, 38);
+    assert.equal(summary.categoryUtilizationPct.Bravo, 0);
+  });
+
+  it('excess hours reduce avg utilization below 100%', () => {
+    // 1 Delta = 8h, client wants 5h → utilization 5/8 = 63%
+    const result = allocateMultiClient({ Bravo: 0, Charlie: 0, Delta: 1 }, [5]);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    const summary = buildSummary(result.allocations);
+    assert.equal(summary.avgUtilizationPct, 63);
+  });
+
+  it('category utilization reflects share of hours provided', () => {
+    // Bravo×2=6h + Charlie×1=5h → total 11h
+    // Bravo%: 6/11=55%, Charlie%: 5/11=45%
+    const result = allocateMultiClient({ Bravo: 2, Charlie: 1, Delta: 0 }, [11]);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    const summary = buildSummary(result.allocations);
+    assert.equal(summary.categoryUtilizationPct.Bravo, 55);
+    assert.equal(summary.categoryUtilizationPct.Charlie, 45);
+    assert.equal(summary.categoryUtilizationPct.Delta, 0);
   });
 });

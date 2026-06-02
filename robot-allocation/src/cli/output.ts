@@ -7,6 +7,7 @@ import {
   RobotAssignment,
   StandbyActivationResult,
 } from '../domain/allocation-types';
+import { AllocationSummary } from '../domain/level4/summary';
 import { ROBOT_CATEGORIES, ROBOT_SPECS } from '../domain/robots';
 import { c } from './colors';
 
@@ -85,6 +86,17 @@ export function printCompareResult(input: LevelCompareInput): void {
   if (!level2.ok) { printLevel2Result(level2); return; }
 
   printCostComparison(input);
+}
+
+export function printAllocationSummary(summary: AllocationSummary): void {
+  console.log(c.prompt('\nAllocation Summary'));
+  console.log(c.value(`Total Robots Used: ${summary.totalRobotsUsed}`));
+  console.log(c.value(`Total Charging Cost: $${summary.totalChargingCost}`));
+  console.log(c.value(`Avg Robot Utilization: ${summary.avgUtilizationPct}%`));
+  console.log(c.prompt('\nEfficiency Metrics'));
+  for (const cat of ROBOT_CATEGORIES) {
+    console.log(c.value(`${cat} utilization: ${summary.categoryUtilizationPct[cat]}%`));
+  }
 }
 
 export function printLevel4Result(result: MultiClientResult): void {

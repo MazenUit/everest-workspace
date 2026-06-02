@@ -5,8 +5,10 @@ import { runLevel1 } from '../services/level-1';
 import { runLevel2 } from '../services/level-2';
 import { runLevel3 } from '../services/level-3';
 import { runLevel4 } from '../services/level-4';
+import { buildSummary } from '../domain/level4/summary';
 import { c } from './colors';
 import {
+  printAllocationSummary,
   printCostComparison,
   printCompareResult,
   printLevel2Result,
@@ -98,8 +100,10 @@ export function runLevel4Cli(): Promise<void> {
     if (hoursResult === 'exit') return 'exit';
     if (hoursResult === 'retry') return 'next';
 
+    const result = runLevel4(countsResult.inventory, hoursResult);
     console.log('');
-    printLevel4Result(runLevel4(countsResult.inventory, hoursResult));
+    printLevel4Result(result);
+    if (result.ok) printAllocationSummary(buildSummary(result.allocations));
     console.log('');
     return 'next';
   });
