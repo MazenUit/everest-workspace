@@ -15,6 +15,8 @@ const ERRORS: Record<string, string> = {
   IMPOSSIBLE_CATEGORY:
     'Error: Unable to allocate at least one robot from each category with the available inventory.',
   INVALID_HOURS: 'Error: Work hours must be a positive integer.',
+  INSUFFICIENT_INVENTORY:
+    'Error: Available inventory cannot meet the requested work hours.',
 };
 
 function printAssignment(title: string, assignment: RobotAssignment): void {

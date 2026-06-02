@@ -20,7 +20,7 @@ export function allocateCostOptimization(
   const bestPlan = findCheapestMix(stock, hoursRequested);
 
   if (bestPlan === null) {
-    return { ok: false, reason: 'NO_ROBOTS' };
+    return { ok: false, reason: 'INSUFFICIENT_INVENTORY' };
   }
 
   const hoursProvided = hoursForAssignment(bestPlan);

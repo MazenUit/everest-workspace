@@ -41,6 +41,6 @@ describe('allocateCostOptimization', () => {
     const result = allocateCostOptimization({ Bravo: 1, Charlie: 0, Delta: 0 }, 100);
     assert.equal(result.ok, false);
     if (result.ok) return;
-    assert.equal(result.reason, 'NO_ROBOTS');
+    assert.equal(result.reason, 'INSUFFICIENT_INVENTORY');
   });
 });
