@@ -33,6 +33,25 @@ export function emptyAssignment(): RobotAssignment {
   return { Bravo: 0, Charlie: 0, Delta: 0 };
 }
 
+// level 4 — multi-client allocation
+export type ClientAllocation =
+  | {
+      hoursRequested: number;
+      servedByActive: true;
+      assignment: RobotAssignment;
+      chargingCost: number;
+    }
+  | {
+      hoursRequested: number;
+      servedByActive: false;
+      standbyAssignment: RobotAssignment;
+      standbyCost: number;
+    };
+
+export type MultiClientResult =
+  | { ok: true; allocations: ClientAllocation[] }
+  | { ok: false; reason: 'INVALID_HOURS' };
+
 // level 3 — standby activation
 export type StandbyActivationSuccess = {
   ok: true;
