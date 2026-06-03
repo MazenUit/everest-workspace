@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { Locker } from '../domain/locker';
 import { Size } from '../domain/types';
 import { findSmallestAvailableLocker } from '../domain/allocator';
@@ -6,6 +7,8 @@ import { calculateStorageCharge } from '../domain/storage-charge';
 import { withTransaction } from '../infrastructure/db';
 import { LockerRepository } from '../infrastructure/locker-repository';
 import { PackageAssignmentRepository } from '../infrastructure/package-assignment-repository';
+
+export type TransactionRunner = <T>(fn: (client: PoolClient) => Promise<T>) => Promise<T>;
 
 export type StorePackageSuccess = { ok: true; lockerId: string; pickupCode: string };
 export type StorePackageFailure = { ok: false; reason: 'NO_SUITABLE_LOCKER' };
@@ -23,7 +26,8 @@ export class LockerStation {
   constructor(
     private readonly lockerRepo: LockerRepository,
     private readonly assignmentRepo: PackageAssignmentRepository,
-    private readonly now: () => Date = () => new Date()
+    private readonly now: () => Date = () => new Date(),
+    private readonly runTransaction: TransactionRunner = withTransaction
   ) {}
 
   listLockers(): Promise<Locker[]> {
@@ -31,7 +35,7 @@ export class LockerStation {
   }
 
   storePackage(packageSize: Size): Promise<StorePackageResult> {
-    return withTransaction(async (client) => {
+    return this.runTransaction(async (client) => {
       const lockers = await this.lockerRepo.listLockersForUpdate(client);
       const locker = findSmallestAvailableLocker(lockers, packageSize);
       if (locker === null) {
@@ -65,7 +69,7 @@ export class LockerStation {
       return { ok: false, reason: 'LOCKER_NOT_FOUND' };
     }
 
-    return withTransaction(async (client) => {
+    return this.runTransaction(async (client) => {
       const lockers = await this.lockerRepo.listLockersForUpdate(client);
       const locker = lockers.find((l) => l.id === lockerId);
       if (!locker) return { ok: false, reason: 'LOCKER_NOT_FOUND' };
