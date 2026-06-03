@@ -32,7 +32,26 @@
 | Day 1–5 costs X | First five days billed at X per day |
 | Day 6–10 costs 2X | Days six to ten billed at 2X per day |
 
-Store/retrieve flows are tested via Docker + Postman against Postgres.
+## locker-station.test.ts
+
+Unit tests for `LockerStation` using in-memory mock repositories and a fake
+transaction runner. No database required.
+
+| Test | Rule |
+|------|------|
+| No lockers | Returns NO_SUITABLE_LOCKER |
+| All occupied | Returns NO_SUITABLE_LOCKER |
+| Package too large | Returns NO_SUITABLE_LOCKER |
+| Success | Returns lockerId + valid pickupCode |
+| Picks smallest fit | Prefers the tightest available locker |
+| Marks unavailable | Locker is occupied after store |
+| Unknown lockerId | Returns LOCKER_NOT_FOUND |
+| Empty locker | Returns LOCKER_EMPTY |
+| Wrong code | Returns INVALID_PICKUP |
+| Correct code | Returns storage charge for days stored |
+| After retrieval | Locker is available again |
+
+Integration tests for concurrent locking and transaction rollback require Docker + Postgres.
 
 ## Dev: test storage charges
 

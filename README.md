@@ -211,6 +211,14 @@ Type `exit` at any prompt to end the session. Level 4 accepts client hours as a 
 
 ---
 
+## AI tool usage
+
+Claude (claude-sonnet-4-6, via Cursor) was used throughout both projects — for initial scaffolding, accelerating boilerplate, and exploring design options.
+
+Every piece of AI-generated output was reviewed, tested, and in many cases rewritten before committing. The architecture decisions (domain/service/delivery layering, repository interfaces, injectable `runTransaction` for testability), error taxonomy, and test strategy were directed and validated by me. AI accelerated the work; it did not replace the engineering judgement behind it.
+
+---
+
 ## Approach, tradeoffs & assumptions
 
 ### Architecture
